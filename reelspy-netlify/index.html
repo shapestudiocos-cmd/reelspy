@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReelSpy — Instagram Reel Research</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #F7F9F4;
+      --bg2:      #FFFFFF;
+      --bg3:      #EEF5EC;
+      --bg4:      #E4F0E1;
+      --green:    #2E7D46;
+      --green2:   #4A9B60;
+      --green3:   #A8D4B0;
+      --green4:   #D4EDDA;
+      --warm:     #F0F7EE;
+      --border:   #C8DFC9;
+      --border2:  #E0EEE1;
+      --text:     #1A2E1C;
+      --text2:    #3A5A3C;
+      --muted:    #7A9E7C;
+      --muted2:   #A8C4AA;
+      --red:      #C0392B;
+      --orange:   #E67E22;
+      --serif:    'DM Serif Display', serif;
+      --mono:     'DM Mono', monospace;
+      --sans:     'Lato', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--bg2);
+      border-bottom: 1.5px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 2px 12px rgba(46,125,70,0.06);
+    }
+
+    .logo {
+      font-family: var(--serif);
+      font-size: 26px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-leaf { color: var(--green); }
+
+    .logo-badge {
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 500;
+      background: var(--green4);
+      color: var(--green);
+      border: 1px solid var(--green3);
+      padding: 3px 8px;
+      letter-spacing: 1px;
+      border-radius: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .pulse {
+      width: 7px; height: 7px;
+      background: var(--green2);
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      animation: pulse 2.5s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(0.85)} }
+
+    /* MAIN LAYOUT */
+    .app-body {
+      display: grid;
+      grid-template-columns: 220px 1fr 260px;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* LEFT NAV - NICHES */
+    .niche-nav {
+      background: var(--bg2);
+      border-right: 1.5px solid var(--border2);
+      overflow-y: auto;
+      height: calc(100vh - 60px);
+      position: sticky;
+      top: 60px;
+    }
+
+    .niche-nav::-webkit-scrollbar { width: 3px; }
+    .niche-nav::-webkit-scrollbar-thumb { background: var(--green3); }
+
+    .nav-header {
+      padding: 16px 18px 10px;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .niche-cat {
+      padding: 12px 18px 4px;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--muted2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .niche-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 18px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text2);
+      transition: background 0.15s, color 0.15s;
+      border-left: 2px solid transparent;
+      font-family: var(--sans);
+    }
+
+    .niche-tag:hover {
+      background: var(--bg3);
+      color: var(--green);
+      border-left-color: var(--green3);
+    }
+
+    .niche-tag.active {
+      background: var(--green4);
+      color: var(--green);
+      border-left-color: var(--green);
+      font-weight: 700;
+    }
+
+    .niche-tag .tag-emoji { font-size: 14px; }
+
+    /* MAIN CONTENT */
+    main {
+      padding: 28px 32px;
+      min-width: 0;
+    }
+
+    /* MODE TABS */
+    .mode-tabs {
+      display: flex;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      width: fit-content;
+    }
+
+    .mode-tab {
+      background: var(--bg2);
+      border: none;
+      padding: 10px 24px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border-right: 1.5px solid var(--border);
+    }
+
+    .mode-tab:last-child { border-right: none; }
+
+    .mode-tab.active {
+      background: var(--green);
+      color: white;
+    }
+
+    .mode-tab:not(.active):hover {
+      background: var(--bg3);
+      color: var(--green);
+    }
+
+    /* SEARCH PANELS */
+    .search-panel { display: none; }
+    .search-panel.active { display: block; }
+
+    /* NICHE SEARCH */
+    .search-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .search-row {
+      display: flex;
+      height: 50px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+      box-shadow: 0 2px 8px rgba(46,125,70,0.06);
+    }
+
+    .search-row:focus-within { border-color: var(--green2); }
+
+    .hash-prefix {
+      background: var(--green);
+      color: white;
+      font-family: var(--serif);
+      font-size: 22px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    #nicheInput {
+      flex: 1;
+      background: var(--bg2);
+      border: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 14px;
+      padding: 0 18px;
+      outline: none;
+    }
+
+    #nicheInput::placeholder { color: var(--muted2); font-style: italic; }
+
+    .search-btn {
+      background: var(--green);
+      border: none;
+      color: white;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 0 26px;
+      cursor: pointer;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .search-btn:hover { background: var(--green2); }
+    .search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* LINK SEARCH */
+    .link-search-wrap {
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg2);
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(46,125,70,0.06);
+    }
+
+    .link-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .link-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    #linkInput {
+      flex: 1;
+      background: var(--bg3);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    #linkInput:focus { border-color: var(--green2); }
+    #linkInput::placeholder { color: var(--muted2); }
+
+    #analyzeBtn {
+      background: var(--green);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      padding: 0 20px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    #analyzeBtn:hover { background: var(--green2); }
+    #analyzeBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .link-hint {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    /* AI ANALYSIS CARD */
+    .analysis-card {
+      display: none;
+      background: var(--bg2);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 20px;
+      margin-top: 16px;
+      border-left: 4px solid var(--green);
+    }
+
+    .analysis-card.show { display: block; animation: fadeUp 0.3s ease; }
+
+    .analysis-title {
+      font-family: var(--serif);
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .analysis-item {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 10px 12px;
+      border-radius: 3px;
+    }
+
+    .ai-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .ai-val {
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .analysis-insight {
+      background: var(--green4);
+      border: 1px solid var(--green3);
+      border-radius: 3px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .related-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      background: var(--bg2);
+      border: 1.5px solid var(--green3);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 5px 12px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+
+    .chip:hover {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+
+    /* RESULTS META */
+    .results-meta {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      margin: 20px 0 14px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid var(--border2);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .results-meta.show { display: flex; }
+
+    .results-meta-left { display: flex; flex-direction: column; gap: 2px; }
+
+    .results-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .sort-select {
+      background: var(--bg2);
+      border: 1.5px solid var(--border);
+      border-radius: 3px;
+      color: var(--text2);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 6px 10px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .sort-select:hover, .sort-select:focus { border-color: var(--green2); color: var(--green); }
+
+    .filter-chips {
+      display: none;
+      gap: 6px;
+      margin: 0 0 14px;
+    }
+
+    .filter-chips.show { display: flex; }
+
+    .fchip {
+      background: var(--bg2);
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 5px 12px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .fchip:hover { border-color: var(--green3); color: var(--green); }
+
+    .fchip.on {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+    }
+
+    /* COPY BUTTON */
+    .btn-copy {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 6px 0;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: all 0.15s;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .btn-copy:hover { border-color: var(--green); color: var(--green); background: var(--green4); }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg2);
+      border: 1.5px solid var(--green);
+      border-left: 4px solid var(--green);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 10px 18px;
+      border-radius: 3px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 500;
+      box-shadow: 0 4px 16px rgba(46,125,70,0.15);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* NAV RESULT BADGE */
+    .niche-tag { justify-content: flex-start; }
+    .niche-tag .nav-count {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 9px;
+      background: var(--green4);
+      color: var(--green);
+      border: 1px solid var(--green3);
+      padding: 1px 6px;
+      border-radius: 2px;
+      letter-spacing: 0.5px;
+    }
+
+    .results-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      color: var(--text);
+    }
+
+    .results-title em { color: var(--green); font-style: normal; }
+
+    .results-count {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* LOADER */
+    .loader { display: none; padding: 50px 0; text-align: center; }
+    .loader.on { display: block; }
+
+    .loader-track {
+      width: 140px;
+      height: 2px;
+      background: var(--border);
+      margin: 0 auto 16px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loader-fill {
+      height: 100%;
+      width: 45%;
+      background: var(--green2);
+      border-radius: 2px;
+      animation: shimmy 0.9s infinite;
+    }
+
+    @keyframes shimmy { from{transform:translateX(-110%)} to{transform:translateX(310%)} }
+
+    .loader-txt {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ERROR */
+    .error-box {
+      display: none;
+      background: #FFF5F5;
+      border: 1.5px solid #FFCCCC;
+      border-left: 4px solid var(--red);
+      padding: 12px 16px;
+      color: var(--red);
+      font-size: 12px;
+      margin: 12px 0;
+      border-radius: 3px;
+      font-family: var(--mono);
+    }
+
+    .error-box.show { display: block; }
+
+    /* REEL CARDS */
+    #results { display: flex; flex-direction: column; gap: 10px; }
+
+    .reel-card {
+      background: var(--bg2);
+      border: 1.5px solid var(--border2);
+      border-radius: 6px;
+      display: grid;
+      grid-template-columns: 96px 1fr 140px;
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      animation: fadeUp 0.3s ease both;
+      box-shadow: 0 1px 4px rgba(46,125,70,0.04);
+    }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    .reel-card:hover {
+      border-color: var(--green3);
+      box-shadow: 0 4px 16px rgba(46,125,70,0.10);
+      transform: translateY(-1px);
+    }
+
+    .reel-card.top1 { border-left: 3px solid #F4C430; }
+    .reel-card.top2 { border-left: 3px solid var(--muted2); }
+    .reel-card.top3 { border-left: 3px solid var(--orange); }
+
+    .reel-thumb {
+      width: 96px;
+      height: 108px;
+      object-fit: cover;
+      display: block;
+      background: var(--bg4);
+    }
+
+    .thumb-ph {
+      width: 96px;
+      height: 108px;
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--muted2);
+      flex-shrink: 0;
+    }
+
+    .reel-body {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .reel-user {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--green2);
+      margin-bottom: 4px;
+    }
+
+    .reel-caption {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+
+    .stat-val {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .stat-lbl {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* RIGHT PANEL */
+    .reel-actions {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      background: var(--warm);
+      border-left: 1px solid var(--border2);
+    }
+
+    .er-block { text-align: right; }
+
+    .er-val {
+      font-family: var(--serif);
+      font-size: 24px;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    .er-lbl {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .rank-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted2);
+    }
+
+    .rank-num.gold { color: #D4A017; font-weight: 500; }
+    .rank-num.silver { color: var(--muted); }
+    .rank-num.bronze { color: var(--orange); }
+
+    .card-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .btn-open {
+      display: block;
+      text-align: center;
+      background: var(--green);
+      border: none;
+      color: white;
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 7px 0;
+      text-decoration: none;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: background 0.15s;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .btn-open:hover { background: var(--green2); }
+
+    .btn-save {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 6px 0;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: all 0.15s;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .btn-save:hover, .btn-save.on {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green4);
+    }
+
+    /* EMPTY STATE */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+
+    .empty h2 {
+      font-family: var(--serif);
+      font-size: 24px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .empty p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-family: var(--sans);
+    }
+
+    /* RIGHT SIDEBAR */
+    .right-sidebar {
+      background: var(--bg2);
+      border-left: 1.5px solid var(--border2);
+      overflow-y: auto;
+      height: calc(100vh - 60px);
+      position: sticky;
+      top: 60px;
+      padding: 20px 16px;
+    }
+
+    .right-sidebar::-webkit-scrollbar { width: 3px; }
+    .right-sidebar::-webkit-scrollbar-thumb { background: var(--green3); }
+
+    .sidebar-section { margin-bottom: 24px; }
+
+    .sidebar-hd {
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-hd button {
+      background: none;
+      border: none;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--muted2);
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-hd button:hover { color: var(--red); }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--border2);
+      margin: 20px 0;
+    }
+
+    /* Saved search items */
+    .ss-item {
+      border: 1px solid var(--border2);
+      border-radius: 3px;
+      padding: 9px 11px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ss-item:hover { border-color: var(--green3); background: var(--warm); }
+
+    .ss-q { font-size: 12px; color: var(--green); font-family: var(--mono); }
+    .ss-m { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    .ss-del {
+      background: none;
+      border: none;
+      color: var(--muted2);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+
+    .ss-del:hover { color: var(--red); }
+
+    .no-data {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+      line-height: 1.9;
+    }
+
+    /* Saved reels */
+    .sr-item {
+      border: 1px solid var(--border2);
+      border-radius: 3px;
+      padding: 9px 11px;
+      margin-bottom: 6px;
+    }
+
+    .sr-user { font-family: var(--mono); font-size: 11px; color: var(--green2); }
+    .sr-stats { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1.5px solid var(--border2);
+      padding: 10px 32px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      background: var(--bg2);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-leaf">🌿</span> ReelSpy
+    <span class="logo-badge">RESEARCH TOOL</span>
+  </div>
+  <div class="header-right">
+    <span><span class="pulse"></span>Instagram · Last 7 days · Ranked by Engagement Rate</span>
+  </div>
+</header>
+
+<div class="app-body">
+
+  <!-- LEFT NICHE NAV -->
+  <nav class="niche-nav" id="nicheNav">
+    <div class="nav-header">Browse Niches</div>
+
+    <div class="niche-cat">Health & Wellness</div>
+    <div class="niche-tag" onclick="nicheClick(this,'fitness')"><span class="tag-emoji">💪</span> Fitness</div>
+    <div class="niche-tag" onclick="nicheClick(this,'yoga')"><span class="tag-emoji">🧘</span> Yoga</div>
+    <div class="niche-tag" onclick="nicheClick(this,'skincare')"><span class="tag-emoji">✨</span> Skincare</div>
+    <div class="niche-tag" onclick="nicheClick(this,'nutrition')"><span class="tag-emoji">🥗</span> Nutrition</div>
+    <div class="niche-tag" onclick="nicheClick(this,'weightloss')"><span class="tag-emoji">⚖️</span> Weight Loss</div>
+    <div class="niche-tag" onclick="nicheClick(this,'mentalhealth')"><span class="tag-emoji">🧠</span> Mental Health</div>
+    <div class="niche-tag" onclick="nicheClick(this,'haircare')"><span class="tag-emoji">💆</span> Hair Care</div>
+
+    <div class="niche-cat">Food & Drink</div>
+    <div class="niche-tag" onclick="nicheClick(this,'streetfood')"><span class="tag-emoji">🌮</span> Street Food</div>
+    <div class="niche-tag" onclick="nicheClick(this,'cooking')"><span class="tag-emoji">👨‍🍳</span> Cooking</div>
+    <div class="niche-tag" onclick="nicheClick(this,'baking')"><span class="tag-emoji">🎂</span> Baking</div>
+    <div class="niche-tag" onclick="nicheClick(this,'coffee')"><span class="tag-emoji">☕</span> Coffee</div>
+    <div class="niche-tag" onclick="nicheClick(this,'vegan')"><span class="tag-emoji">🌱</span> Vegan</div>
+    <div class="niche-tag" onclick="nicheClick(this,'desifood')"><span class="tag-emoji">🍛</span> Desi Food</div>
+    <div class="niche-tag" onclick="nicheClick(this,'cocktails')"><span class="tag-emoji">🍹</span> Cocktails</div>
+
+    <div class="niche-cat">Fashion & Beauty</div>
+    <div class="niche-tag" onclick="nicheClick(this,'fashion')"><span class="tag-emoji">👗</span> Fashion</div>
+    <div class="niche-tag" onclick="nicheClick(this,'makeup')"><span class="tag-emoji">💄</span> Makeup</div>
+    <div class="niche-tag" onclick="nicheClick(this,'jewellery')"><span class="tag-emoji">💍</span> Jewellery</div>
+    <div class="niche-tag" onclick="nicheClick(this,'nailart')"><span class="tag-emoji">💅</span> Nail Art</div>
+    <div class="niche-tag" onclick="nicheClick(this,'ootd')"><span class="tag-emoji">🪞</span> OOTD</div>
+    <div class="niche-tag" onclick="nicheClick(this,'thrifting')"><span class="tag-emoji">🛍️</span> Thrifting</div>
+    <div class="niche-tag" onclick="nicheClick(this,'saree')"><span class="tag-emoji">🌺</span> Saree</div>
+
+    <div class="niche-cat">Business & Finance</div>
+    <div class="niche-tag" onclick="nicheClick(this,'entrepreneur')"><span class="tag-emoji">🚀</span> Entrepreneur</div>
+    <div class="niche-tag" onclick="nicheClick(this,'investing')"><span class="tag-emoji">📈</span> Investing</div>
+    <div class="niche-tag" onclick="nicheClick(this,'personalfinance')"><span class="tag-emoji">💰</span> Personal Finance</div>
+    <div class="niche-tag" onclick="nicheClick(this,'startup')"><span class="tag-emoji">💡</span> Startup</div>
+    <div class="niche-tag" onclick="nicheClick(this,'marketing')"><span class="tag-emoji">📣</span> Marketing</div>
+    <div class="niche-tag" onclick="nicheClick(this,'freelancing')"><span class="tag-emoji">💻</span> Freelancing</div>
+    <div class="niche-tag" onclick="nicheClick(this,'dropshipping')"><span class="tag-emoji">📦</span> Dropshipping</div>
+
+    <div class="niche-cat">Tech & AI</div>
+    <div class="niche-tag" onclick="nicheClick(this,'aitools')"><span class="tag-emoji">🤖</span> AI Tools</div>
+    <div class="niche-tag" onclick="nicheClick(this,'coding')"><span class="tag-emoji">👨‍💻</span> Coding</div>
+    <div class="niche-tag" onclick="nicheClick(this,'gadgets')"><span class="tag-emoji">📱</span> Gadgets</div>
+    <div class="niche-tag" onclick="nicheClick(this,'cybersecurity')"><span class="tag-emoji">🔐</span> Cybersecurity</div>
+    <div class="niche-tag" onclick="nicheClick(this,'gaming')"><span class="tag-emoji">🎮</span> Gaming</div>
+
+    <div class="niche-cat">Travel</div>
+    <div class="niche-tag" onclick="nicheClick(this,'travel')"><span class="tag-emoji">✈️</span> Travel</div>
+    <div class="niche-tag" onclick="nicheClick(this,'solotravel')"><span class="tag-emoji">🧭</span> Solo Travel</div>
+    <div class="niche-tag" onclick="nicheClick(this,'budgettravel')"><span class="tag-emoji">💸</span> Budget Travel</div>
+    <div class="niche-tag" onclick="nicheClick(this,'adventure')"><span class="tag-emoji">🏔️</span> Adventure</div>
+    <div class="niche-tag" onclick="nicheClick(this,'beach')"><span class="tag-emoji">🏖️</span> Beach</div>
+    <div class="niche-tag" onclick="nicheClick(this,'incredibleindia')"><span class="tag-emoji">🇮🇳</span> Incredible India</div>
+
+    <div class="niche-cat">Lifestyle</div>
+    <div class="niche-tag" onclick="nicheClick(this,'homedecor')"><span class="tag-emoji">🏠</span> Home Decor</div>
+    <div class="niche-tag" onclick="nicheClick(this,'minimalism')"><span class="tag-emoji">⬜</span> Minimalism</div>
+    <div class="niche-tag" onclick="nicheClick(this,'sustainability')"><span class="tag-emoji">♻️</span> Sustainability</div>
+    <div class="niche-tag" onclick="nicheClick(this,'books')"><span class="tag-emoji">📚</span> Books</div>
+    <div class="niche-tag" onclick="nicheClick(this,'photography')"><span class="tag-emoji">📷</span> Photography</div>
+    <div class="niche-tag" onclick="nicheClick(this,'art')"><span class="tag-emoji">🎨</span> Art</div>
+    <div class="niche-tag" onclick="nicheClick(this,'pets')"><span class="tag-emoji">🐶</span> Pets</div>
+
+    <div class="niche-cat">Entertainment</div>
+    <div class="niche-tag" onclick="nicheClick(this,'music')"><span class="tag-emoji">🎵</span> Music</div>
+    <div class="niche-tag" onclick="nicheClick(this,'dance')"><span class="tag-emoji">💃</span> Dance</div>
+    <div class="niche-tag" onclick="nicheClick(this,'comedy')"><span class="tag-emoji">😂</span> Comedy</div>
+    <div class="niche-tag" onclick="nicheClick(this,'bollywood')"><span class="tag-emoji">🎬</span> Bollywood</div>
+    <div class="niche-tag" onclick="nicheClick(this,'cricket')"><span class="tag-emoji">🏏</span> Cricket</div>
+    <div class="niche-tag" onclick="nicheClick(this,'anime')"><span class="tag-emoji">⚡</span> Anime</div>
+
+    <div class="niche-cat">Education</div>
+    <div class="niche-tag" onclick="nicheClick(this,'studytips')"><span class="tag-emoji">📝</span> Study Tips</div>
+    <div class="niche-tag" onclick="nicheClick(this,'careeradvice')"><span class="tag-emoji">🎯</span> Career Advice</div>
+    <div class="niche-tag" onclick="nicheClick(this,'languagelearning')"><span class="tag-emoji">🗣️</span> Language</div>
+    <div class="niche-tag" onclick="nicheClick(this,'science')"><span class="tag-emoji">🔬</span> Science</div>
+    <div class="niche-tag" onclick="nicheClick(this,'history')"><span class="tag-emoji">🏛️</span> History</div>
+
+    <div class="niche-cat">D2C & Brand</div>
+    <div class="niche-tag" onclick="nicheClick(this,'makhana')"><span class="tag-emoji">🫘</span> Makhana</div>
+    <div class="niche-tag" onclick="nicheClick(this,'d2cbrand')"><span class="tag-emoji">📦</span> D2C Brand</div>
+    <div class="niche-tag" onclick="nicheClick(this,'tattoo')"><span class="tag-emoji">🖋️</span> Tattoo</div>
+    <div class="niche-tag" onclick="nicheClick(this,'restaurant')"><span class="tag-emoji">🍽️</span> Restaurant</div>
+    <div class="niche-tag" onclick="nicheClick(this,'realestate')"><span class="tag-emoji">🏗️</span> Real Estate</div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <!-- MODE TABS -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-niche" onclick="switchMode('niche')">
+        🔍 Search by Niche
+      </button>
+      <button class="mode-tab" id="tab-link" onclick="switchMode('link')">
+        🔗 Analyse Reel Link
+      </button>
+    </div>
+
+    <!-- NICHE SEARCH PANEL -->
+    <div class="search-panel active" id="panel-niche">
+      <div class="search-eyebrow">Enter niche or topic</div>
+      <div class="search-row">
+        <div class="hash-prefix">#</div>
+        <input id="nicheInput" type="text" placeholder="skincare, makhana, fitness, travel..." autocomplete="off" />
+        <button class="search-btn" id="nicheBtn" onclick="doNicheSearch()">Search →</button>
+      </div>
+    </div>
+
+    <!-- LINK ANALYSIS PANEL -->
+    <div class="search-panel" id="panel-link">
+      <div class="link-search-wrap">
+        <div class="link-label">Paste an Instagram Reel URL</div>
+        <div class="link-row">
+          <input id="linkInput" type="text" placeholder="https://www.instagram.com/reel/XXXXXXXXX/" />
+          <button id="analyzeBtn" onclick="doAnalyze()">🤖 Analyse with AI</button>
+        </div>
+        <div class="link-hint">// AI will identify the niche, content type & hook — then find related trending reels</div>
+      </div>
+      <div class="analysis-card" id="analysisCard">
+        <div class="analysis-title">🤖 AI Analysis</div>
+        <div class="analysis-grid" id="analysisGrid"></div>
+        <div class="analysis-insight" id="analysisInsight"></div>
+        <div class="ai-label" style="margin-bottom:6px">Search related reels:</div>
+        <div class="related-chips" id="relatedChips"></div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="error-box" id="errorBox"></div>
+    <div class="loader" id="loader">
+      <div class="loader-track"><div class="loader-fill"></div></div>
+      <div class="loader-txt">Scanning Instagram...</div>
+    </div>
+
+    <div class="results-meta" id="resultsMeta">
+      <div class="results-meta-left">
+        <div class="results-title">Results for <em id="queryLabel"></em></div>
+        <div class="results-count" id="countLabel"></div>
+      </div>
+      <div class="results-controls">
+        <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+          <option value="er">Engagement Rate ↓</option>
+          <option value="views">Views ↓</option>
+          <option value="likes">Likes ↓</option>
+          <option value="recent">Most Recent</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-chips" id="filterChips">
+      <button class="fchip on" data-min="0" onclick="setMinViews(this,0)">All</button>
+      <button class="fchip" data-min="10000" onclick="setMinViews(this,10000)">10K+</button>
+      <button class="fchip" data-min="100000" onclick="setMinViews(this,100000)">100K+</button>
+      <button class="fchip" data-min="1000000" onclick="setMinViews(this,1000000)">1M+</button>
+    </div>
+
+    <div id="results">
+      <div class="empty">
+        <div class="empty-icon">🌿</div>
+        <h2>Start your research.</h2>
+        <p>Search a niche above, pick one from the left panel,<br />or paste a reel link for AI-powered analysis.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="right-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-hd">
+        Saved Searches
+        <button onclick="clearSearches()">clear</button>
+      </div>
+      <div id="savedSearches">
+        <div class="no-data">No saved searches.<br />Run a search to start.</div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="sidebar-section">
+      <div class="sidebar-hd">
+        Saved Reels
+        <button onclick="clearReels()">clear</button>
+      </div>
+      <div id="savedReels">
+        <div class="no-data">Star a reel to save it<br />for reference later.</div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<footer>
+  <span>ReelSpy · Instagram Content Research</span>
+  <span>Built by Shape Studio</span>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// RESULT STATE (in-memory, session-only)
+// ─────────────────────────────────────────────
+let currentReels = [];
+let currentQuery = '';
+let currentMinViews = 0;
+const nicheResultsCache = new Map();
+
+// ─────────────────────────────────────────────
+// SECURITY HELPERS
+// ─────────────────────────────────────────────
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function safeUrl(u) {
+  if (!u) return '';
+  try {
+    const parsed = new URL(String(u), window.location.href);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.href;
+  } catch (e) {}
+  return '';
+}
+// ─────────────────────────────────────────────
+// MODE SWITCHER
+// ─────────────────────────────────────────────
+function switchMode(mode) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.search-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + mode).classList.add('active');
+  document.getElementById('panel-' + mode).classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+// NICHE NAV CLICK
+// ─────────────────────────────────────────────
+function nicheClick(el, query) {
+  document.querySelectorAll('.niche-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  switchMode('niche');
+  document.getElementById('nicheInput').value = query;
+  doNicheSearch();
+}
+
+// Keyboard
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('nicheInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doNicheSearch();
+  });
+  document.getElementById('linkInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doAnalyze();
+  });
+  document.querySelectorAll('.niche-tag').forEach(tag => {
+    tag.setAttribute('role', 'button');
+    tag.setAttribute('tabindex', '0');
+    tag.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tag.click(); }
+    });
+  });
+  renderSavedSearches();
+  renderSavedReels();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key !== '/') return;
+  const t = e.target;
+  const tag = (t && t.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || (t && t.isContentEditable)) return;
+  e.preventDefault();
+  switchMode('niche');
+  const input = document.getElementById('nicheInput');
+  input.focus();
+  input.select();
+});
+
+// ─────────────────────────────────────────────
+// NICHE SEARCH
+// ─────────────────────────────────────────────
+async function doNicheSearch(customQuery) {
+  const raw = (customQuery || document.getElementById('nicheInput').value).trim().replace(/^#/, '');
+  if (!raw) return;
+  if (!customQuery) document.getElementById('nicheInput').value = raw;
+
+  setLoading(true);
+  clearResults();
+
+  try {
+    const res = await fetch(`/api/search?query=${encodeURIComponent(raw)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API error');
+
+    renderResults(data.reels, `#${raw}`, `${data.total} reels · last 7 days · sorted by engagement rate`);
+    nicheResultsCache.set(raw, data.total);
+    updateNavBadges();
+    saveSearch(raw, data.total);
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ─────────────────────────────────────────────
+// LINK ANALYSIS
+// ─────────────────────────────────────────────
+async function doAnalyze() {
+  const url = document.getElementById('linkInput').value.trim();
+  if (!url) return;
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analysing...';
+  clearResults();
+  document.getElementById('analysisCard').classList.remove('show');
+  setLoading(true);
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reelUrl: url }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Analysis failed');
+
+    const a = data.analysis || {};
+
+    // Render analysis card (XSS-safe)
+    document.getElementById('analysisGrid').innerHTML = `
+      <div class="analysis-item"><div class="ai-label">Niche</div><div class="ai-val">${escapeHtml(a.niche || '—')}</div></div>
+      <div class="analysis-item"><div class="ai-label">Content Type</div><div class="ai-val">${escapeHtml(a.contentType || '—')}</div></div>
+      <div class="analysis-item"><div class="ai-label">Tone</div><div class="ai-val">${escapeHtml(a.tone || '—')}</div></div>
+      <div class="analysis-item"><div class="ai-label">Hook Style</div><div class="ai-val">${escapeHtml(a.hook || '—')}</div></div>
+    `;
+
+    const insightEl = document.getElementById('analysisInsight');
+    insightEl.innerHTML = '';
+    const strong = document.createElement('strong');
+    strong.textContent = 'Why it works:';
+    insightEl.appendChild(strong);
+    insightEl.appendChild(document.createTextNode(' ' + (a.whyItWorks || 'Analysis not available.')));
+
+    const chips = document.getElementById('relatedChips');
+    chips.innerHTML = '';
+    (Array.isArray(a.relatedQueries) ? a.relatedQueries : []).forEach(q => {
+      const qs = String(q || '');
+      const chip = document.createElement('button');
+      chip.className = 'chip';
+      chip.type = 'button';
+      chip.textContent = '#' + qs;
+      chip.addEventListener('click', () => {
+        switchMode('niche');
+        document.getElementById('nicheInput').value = qs;
+        doNicheSearch(qs);
+      });
+      chips.appendChild(chip);
+    });
+
+    document.getElementById('analysisCard').classList.add('show');
+    setLoading(false);
+
+    // Auto-search the top related query
+    if (a.relatedQueries && a.relatedQueries.length > 0) {
+      switchMode('niche');
+      document.getElementById('nicheInput').value = a.relatedQueries[0];
+      await doNicheSearch(a.relatedQueries[0]);
+      switchMode('link'); // Go back to show the analysis card
+    }
+
+  } catch (err) {
+    setLoading(false);
+    showError(err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🤖 Analyse with AI';
+  }
+}
+
+// ─────────────────────────────────────────────
+// RENDER RESULTS
+// ─────────────────────────────────────────────
+function renderResults(reels, label, subLabel) {
+  currentReels = Array.isArray(reels) ? reels.slice() : [];
+  currentQuery = label || '';
+  currentMinViews = 0;
+  document.getElementById('sortSelect').value = 'er';
+  document.querySelectorAll('#filterChips .fchip').forEach(c => c.classList.toggle('on', c.dataset.min === '0'));
+
+  const meta = document.getElementById('resultsMeta');
+  meta.classList.add('show');
+  document.getElementById('queryLabel').textContent = label;
+  document.getElementById('countLabel').textContent = subLabel;
+  document.getElementById('filterChips').classList.toggle('show', currentReels.length > 0);
+
+  renderReelCards(currentReels);
+}
+
+function renderReelCards(reels) {
+  const container = document.getElementById('results');
+  container.innerHTML = '';
+
+  if (!reels || reels.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h2>No reels match.</h2><p>Try a different sort or lower the minimum views.</p></div>`;
+    return;
+  }
+
+  reels.forEach((r, i) => {
+    const topClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+    const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+    const rankLabel = i === 0 ? '🥇 #1' : i === 1 ? '🥈 #2' : i === 2 ? '🥉 #3' : `#${i + 1}`;
+    const saved = isReelSaved(r);
+
+    const username = String(r.username || 'unknown');
+    const caption = String(r.caption || 'No caption available');
+    const reelUrl = safeUrl(r.url);
+    const thumbUrl = safeUrl(r.thumbnail);
+    const er = (r.engagementRate == null || isNaN(Number(r.engagementRate))) ? '—' : Number(r.engagementRate).toFixed(2);
+    const erDisplay = er === '—' ? '—' : `${er}%`;
+
+    const card = document.createElement('div');
+    card.className = `reel-card ${topClass}`.trim();
+    card.style.animationDelay = `${i * 45}ms`;
+
+    const thumbHtml = thumbUrl
+      ? `<img class="reel-thumb" src="${escapeHtml(thumbUrl)}" alt="${escapeHtml('@' + username)}" loading="lazy" onerror="this.outerHTML='<div class=thumb-ph>🎬</div>'" />`
+      : `<div class="thumb-ph" aria-hidden="true">🎬</div>`;
+
+    const openBtnHtml = reelUrl
+      ? `<a class="btn-open" href="${escapeHtml(reelUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open reel by @${escapeHtml(username)} on Instagram">Open Reel ↗</a>`
+      : `<span class="btn-open" aria-disabled="true" style="opacity:0.5;cursor:not-allowed">Open Reel ↗</span>`;
+
+    card.innerHTML = `
+      ${thumbHtml}
+      <div class="reel-body">
+        <div>
+          <div class="reel-user">@${escapeHtml(username)} · ${escapeHtml(timeAgo(r.postedAt))}</div>
+          <div class="reel-caption">${escapeHtml(caption)}</div>
+        </div>
+        <div class="stats-row">
+          <div class="stat"><div class="stat-val">${escapeHtml(fmt(r.views))}</div><div class="stat-lbl">Views</div></div>
+          <div class="stat"><div class="stat-val">${escapeHtml(fmt(r.likes))}</div><div class="stat-lbl">Likes</div></div>
+          <div class="stat"><div class="stat-val">${escapeHtml(fmt(r.comments))}</div><div class="stat-lbl">Comments</div></div>
+          <div class="stat"><div class="stat-val">${escapeHtml(fmt(r.shares))}</div><div class="stat-lbl">Shares</div></div>
+          <div class="stat"><div class="stat-val">${escapeHtml(fmt(r.saves))}</div><div class="stat-lbl">Saves</div></div>
+        </div>
+      </div>
+      <div class="reel-actions">
+        <div class="er-block">
+          <div class="er-val">${escapeHtml(erDisplay)}</div>
+          <div class="er-lbl">Eng. Rate</div>
+        </div>
+        <div class="rank-num ${rankClass}">${escapeHtml(rankLabel)}</div>
+        <div class="card-btns">
+          ${openBtnHtml}
+          <button class="btn-save ${saved ? 'on' : ''}" type="button" aria-label="${saved ? 'Unsave this reel' : 'Save this reel'}" aria-pressed="${saved ? 'true' : 'false'}">
+            ${saved ? '★ Saved' : '☆ Save'}
+          </button>
+          <button class="btn-copy" type="button" aria-label="Copy caption to clipboard">⧉ Copy Caption</button>
+        </div>
+      </div>
+    `;
+
+    const saveBtn = card.querySelector('.btn-save');
+    if (saveBtn) saveBtn.addEventListener('click', () => toggleSave(saveBtn, r));
+    const copyBtn = card.querySelector('.btn-copy');
+    if (copyBtn) copyBtn.addEventListener('click', () => copyCaption(copyBtn, r.caption || ''));
+
+    container.appendChild(card);
+  });
+}
+
+// ─────────────────────────────────────────────
+// SORT / FILTER
+// ─────────────────────────────────────────────
+function setMinViews(btn, min) {
+  currentMinViews = min;
+  document.querySelectorAll('#filterChips .fchip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  applyFilters();
+}
+
+function applyFilters() {
+  const sort = document.getElementById('sortSelect').value;
+  let list = currentReels.filter(r => (r.views || 0) >= currentMinViews);
+
+  if (sort === 'views') list.sort((a, b) => (b.views || 0) - (a.views || 0));
+  else if (sort === 'likes') list.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+  else if (sort === 'recent') list.sort((a, b) => (b.postedAt || 0) - (a.postedAt || 0));
+  // 'er' preserves server order
+
+  renderReelCards(list);
+}
+
+// ─────────────────────────────────────────────
+// COPY CAPTION + TOAST
+// ─────────────────────────────────────────────
+function copyCaption(btn, text) {
+  const doFallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = text || '';
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  };
+  const done = () => {
+    showToast('✓ Copied!');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.textContent = orig; }, 1400);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text || '').then(done).catch(() => { doFallback(); done(); });
+  } else {
+    doFallback(); done();
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 1600);
+}
+
+// ─────────────────────────────────────────────
+// NAV BADGES
+// ─────────────────────────────────────────────
+function updateNavBadges() {
+  document.querySelectorAll('.niche-tag').forEach(tag => {
+    const onclick = tag.getAttribute('onclick') || '';
+    const m = onclick.match(/nicheClick\(this,'([^']+)'\)/);
+    if (!m) return;
+    const key = m[1];
+    const existing = tag.querySelector('.nav-count');
+    if (nicheResultsCache.has(key)) {
+      const n = nicheResultsCache.get(key);
+      if (existing) existing.textContent = n;
+      else {
+        const badge = document.createElement('span');
+        badge.className = 'nav-count';
+        badge.textContent = n;
+        tag.appendChild(badge);
+      }
+    } else if (existing) {
+      existing.remove();
+    }
+  });
+}
+
+// ─────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────
+function fmt(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toString();
+}
+
+function timeAgo(ts) {
+  if (!ts) return '';
+  const deltaSec = Math.floor(Date.now() / 1000 - ts);
+  if (!isFinite(deltaSec) || deltaSec < 0) return 'just now';
+  if (deltaSec < 60) return 'just now';
+  const m = Math.floor(deltaSec / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
+function setLoading(on) {
+  document.getElementById('loader').classList[on ? 'add' : 'remove']('on');
+  document.getElementById('nicheBtn') && (document.getElementById('nicheBtn').disabled = on);
+}
+
+function clearResults() {
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('resultsMeta').classList.remove('show');
+  document.getElementById('filterChips').classList.remove('show');
+  document.getElementById('errorBox').classList.remove('show');
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('show');
+}
+
+// ─────────────────────────────────────────────
+// SAVED SEARCHES
+// ─────────────────────────────────────────────
+function getSearches() { try { return JSON.parse(localStorage.getItem('rs2_searches') || '[]'); } catch { return []; } }
+
+function saveSearch(q, count) {
+  let arr = getSearches().filter(s => s.q !== q);
+  arr.unshift({ q, count, time: Date.now() });
+  if (arr.length > 20) arr.length = 20;
+  localStorage.setItem('rs2_searches', JSON.stringify(arr));
+  renderSavedSearches();
+}
+
+function renderSavedSearches() {
+  const el = document.getElementById('savedSearches');
+  const arr = getSearches();
+  el.innerHTML = '';
+  if (!arr.length) {
+    el.innerHTML = '<div class="no-data">No saved searches.<br />Run a search to start.</div>';
+    return;
+  }
+  arr.forEach(s => {
+    const q = String(s.q || '');
+    const count = Number(s.count) || 0;
+    const item = document.createElement('div');
+    item.className = 'ss-item';
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    item.innerHTML = `
+      <div><div class="ss-q">#${escapeHtml(q)}</div><div class="ss-m">${escapeHtml(String(count))} reels</div></div>
+      <button class="ss-del" type="button" aria-label="Delete saved search">×</button>
+    `;
+    item.addEventListener('click', () => quickSearch(q));
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); quickSearch(q); }
+    });
+    const delBtn = item.querySelector('.ss-del');
+    delBtn.addEventListener('click', e => { e.stopPropagation(); deleteSavedSearch(q); });
+    el.appendChild(item);
+  });
+}
+
+function deleteSavedSearch(q) {
+  localStorage.setItem('rs2_searches', JSON.stringify(getSearches().filter(s => s.q !== q)));
+  renderSavedSearches();
+}
+
+function clearSearches() {
+  localStorage.removeItem('rs2_searches');
+  renderSavedSearches();
+}
+
+function quickSearch(q) {
+  switchMode('niche');
+  document.getElementById('nicheInput').value = q;
+  doNicheSearch(q);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─────────────────────────────────────────────
+// SAVED REELS
+// ─────────────────────────────────────────────
+function getReels() { try { return JSON.parse(localStorage.getItem('rs2_reels') || '[]'); } catch { return []; } }
+
+function reelKey(r) { return r.url || ''; }
+
+function isReelSaved(r) { return getReels().some(x => reelKey(x) === reelKey(r)); }
+
+function toggleSave(btn, reel) {
+  let arr = getReels();
+  const idx = arr.findIndex(x => reelKey(x) === reelKey(reel));
+  if (idx >= 0) { arr.splice(idx, 1); btn.textContent = '☆ Save'; btn.classList.remove('on'); }
+  else { arr.unshift(reel); btn.textContent = '★ Saved'; btn.classList.add('on'); }
+  localStorage.setItem('rs2_reels', JSON.stringify(arr));
+  renderSavedReels();
+}
+
+function renderSavedReels() {
+  const el = document.getElementById('savedReels');
+  const arr = getReels();
+  if (!arr.length) { el.innerHTML = '<div class="no-data">Star a reel to save it<br />for reference later.</div>'; return; }
+  el.innerHTML = arr.map(r => {
+    const u = escapeHtml(String(r.username || 'unknown'));
+    const v = escapeHtml(fmt(r.views));
+    const er = (r.engagementRate == null || isNaN(Number(r.engagementRate))) ? '—' : escapeHtml(Number(r.engagementRate).toFixed(2) + '%');
+    return `
+    <div class="sr-item">
+      <div class="sr-user">@${u}</div>
+      <div class="sr-stats">${v} views · ${er} ER</div>
+    </div>`;
+  }).join('');
+}
+
+function clearReels() {
+  localStorage.removeItem('rs2_reels');
+  renderSavedReels();
+}
+</script>
+</body>
+</html>
